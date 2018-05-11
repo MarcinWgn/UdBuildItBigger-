@@ -8,8 +8,8 @@
    }
   }
  },
- "basePath": "/_ah/api/myApi/v1/sayHi/",
- "baseUrl": "https://myApplicationId.appspot.com/_ah/api/myApi/v1/sayHi/",
+ "basePath": "/_ah/api/myApi/v1/mybean/",
+ "baseUrl": "https://myApplicationId.appspot.com/_ah/api/myApi/v1/mybean/",
  "batchPath": "batch",
  "description": "This is an API",
  "discoveryVersion": "v1",
@@ -20,20 +20,20 @@
  "id": "myApi:v1",
  "kind": "discovery#restDescription",
  "methods": {
-  "sayHi": {
-   "httpMethod": "POST",
-   "id": "myApi.sayHi",
+  "getJoke": {
+   "httpMethod": "GET",
+   "id": "myApi.getJoke",
    "parameterOrder": [
-    "name"
+    "joke"
    ],
    "parameters": {
-    "name": {
+    "joke": {
      "location": "path",
      "required": true,
      "type": "string"
     }
    },
-   "path": "{name}",
+   "path": "{joke}",
    "response": {
     "$ref": "MyBean"
    },
@@ -103,6 +103,6 @@
    "type": "object"
   }
  },
- "servicePath": "myApi/v1/sayHi/",
+ "servicePath": "myApi/v1/mybean/",
  "version": "v1"
 }
