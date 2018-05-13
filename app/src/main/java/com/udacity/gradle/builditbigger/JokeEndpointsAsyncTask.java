@@ -1,16 +1,12 @@
 package com.udacity.gradle.builditbigger;
 
-import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
-import android.support.v4.util.Pair;
-
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.google.api.client.googleapis.services.AbstractGoogleClientRequest;
 import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
 import com.udacity.gradle.builditbigger.backend.myApi.MyApi;
-import com.wegrzyn.marcin.androidjokeslibrary.JokesActivity;
+import com.wegrzyn.marcin.javajokeslib.JavaJokes;
 
 import java.io.IOException;
 
@@ -18,13 +14,24 @@ import java.io.IOException;
  * Created by Marcin Węgrzyn on 12.05.2018.
  * wireamg@gmail.com
  */
-class JokeEndpointsAsyncTask extends AsyncTask<Pair<Context, String>, Void, String> {
+class JokeEndpointsAsyncTask extends AsyncTask<Void, Void, String> {
     private static MyApi myApiService = null;
 
-    private Context context;
+    private CallbackInterface callbackInterface;
+    private JavaJokes jokes = new JavaJokes();
+
+
+    public interface CallbackInterface{
+        void onPostTask(String joke);
+    }
+
+
+    JokeEndpointsAsyncTask(CallbackInterface callbackInterface) {
+        this.callbackInterface = callbackInterface;
+    }
 
     @Override
-    protected final String doInBackground(Pair<Context, String>... params) {
+    protected final String doInBackground(Void ... voids) {
         if(myApiService == null) {  // Only do this once
             MyApi.Builder builder = new MyApi.Builder(AndroidHttp.newCompatibleTransport(),
                     new AndroidJsonFactory(), null)
@@ -42,12 +49,8 @@ class JokeEndpointsAsyncTask extends AsyncTask<Pair<Context, String>, Void, Stri
 
             myApiService = builder.build();
         }
-
-        context = params[0].first;
-        String joke = params[0].second;
-
         try {
-            return myApiService.getJoke(joke).execute().getData();
+            return myApiService.getJoke(jokes.getJoke()).execute().getData();
         } catch (IOException e) {
             return e.getMessage();
         }
@@ -55,8 +58,8 @@ class JokeEndpointsAsyncTask extends AsyncTask<Pair<Context, String>, Void, Stri
 
     @Override
     protected void onPostExecute(String result) {
-        Intent intent = new Intent(context, JokesActivity.class);
-        intent.putExtra(JokesActivity.JOKES_STRING, result);
-        context.startActivity(intent);
+        callbackInterface.onPostTask(result);
     }
+
+
 }

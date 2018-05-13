@@ -1,27 +1,20 @@
 package com.udacity.gradle.builditbigger;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
-
 import com.wegrzyn.marcin.androidjokeslibrary.JokesActivity;
-import com.wegrzyn.marcin.javajokeslib.JavaJokes;
 
-
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements JokeEndpointsAsyncTask.CallbackInterface {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -32,9 +25,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
@@ -46,9 +36,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void tellJoke(View view) {
-        String joke = new JavaJokes().getJoke();
-        new JokeEndpointsAsyncTask().execute(new Pair<Context, String>(this, joke));
+       new JokeEndpointsAsyncTask(this).execute();
     }
 
-
+    @Override
+    public void onPostTask(String joke) {
+        Intent intent = new Intent(this, JokesActivity.class);
+        intent.putExtra(JokesActivity.JOKES_STRING, joke);
+        startActivity(intent);
+    }
 }
