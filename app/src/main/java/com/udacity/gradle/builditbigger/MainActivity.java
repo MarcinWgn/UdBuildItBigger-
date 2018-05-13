@@ -8,12 +8,31 @@ import android.view.MenuItem;
 import android.view.View;
 import com.wegrzyn.marcin.androidjokeslibrary.JokesActivity;
 
-public class MainActivity extends AppCompatActivity implements JokeEndpointsAsyncTask.CallbackInterface {
+public class MainActivity extends AppCompatActivity {
+
+
+    private JokeEndpointsAsyncTask task;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        task = new JokeEndpointsAsyncTask();
+        task.registerListener(new JokeEndpointsAsyncTask.CallbackInterface() {
+            @Override
+            public void onPostTask(String joke) {
+                Intent intent = new Intent(getBaseContext(), JokesActivity.class);
+                intent.putExtra(JokesActivity.JOKES_STRING, joke);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override
@@ -35,14 +54,14 @@ public class MainActivity extends AppCompatActivity implements JokeEndpointsAsyn
         return super.onOptionsItemSelected(item);
     }
 
-    public void tellJoke(View view) {
-       new JokeEndpointsAsyncTask(this).execute();
+    @Override
+    protected void onDestroy() {
+        task.unregisterListener();
+        super.onDestroy();
     }
 
-    @Override
-    public void onPostTask(String joke) {
-        Intent intent = new Intent(this, JokesActivity.class);
-        intent.putExtra(JokesActivity.JOKES_STRING, joke);
-        startActivity(intent);
+    public void tellJoke(View view) {
+        task.execute();
     }
+
 }

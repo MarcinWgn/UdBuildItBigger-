@@ -22,10 +22,14 @@ class JokeEndpointsAsyncTask extends AsyncTask<Void, Void, String> {
     public interface CallbackInterface{
         void onPostTask(String joke);
     }
-    JokeEndpointsAsyncTask(CallbackInterface callbackInterface) {
+
+    public void registerListener(CallbackInterface callbackInterface){
         this.callbackInterface = callbackInterface;
     }
 
+    public void unregisterListener (){
+        callbackInterface = null;
+    }
     @Override
     protected final String doInBackground(Void ... voids) {
         if(myApiService == null) {  // Only do this once
@@ -53,7 +57,9 @@ class JokeEndpointsAsyncTask extends AsyncTask<Void, Void, String> {
 
     @Override
     protected void onPostExecute(String result) {
-        callbackInterface.onPostTask(result);
+        if(callbackInterface != null){
+            callbackInterface.onPostTask(result);
+        }
     }
 
 
