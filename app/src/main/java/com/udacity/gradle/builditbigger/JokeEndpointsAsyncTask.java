@@ -1,6 +1,8 @@
 package com.udacity.gradle.builditbigger;
 
 import android.os.AsyncTask;
+import android.support.test.espresso.IdlingRegistry;
+import android.support.test.espresso.idling.CountingIdlingResource;
 
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
@@ -15,9 +17,11 @@ import java.io.IOException;
  * wireamg@gmail.com
  */
 class JokeEndpointsAsyncTask extends AsyncTask<Void, Void, String> {
-    private static MyApi myApiService = null;
 
+    private static MyApi myApiService = null;
     private CallbackInterface callbackInterface;
+
+    private CountingIdlingResource idlingResource = new CountingIdlingResource("loader_data");
 
     public interface CallbackInterface{
         void onPostTask(String joke);
@@ -30,6 +34,14 @@ class JokeEndpointsAsyncTask extends AsyncTask<Void, Void, String> {
     public void unregisterListener (){
         callbackInterface = null;
     }
+
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+        IdlingRegistry.getInstance().register(idlingResource);
+        idlingResource.increment();
+    }
+
     @Override
     protected final String doInBackground(Void ... voids) {
         if(myApiService == null) {  // Only do this once
@@ -57,6 +69,9 @@ class JokeEndpointsAsyncTask extends AsyncTask<Void, Void, String> {
 
     @Override
     protected void onPostExecute(String result) {
+
+        idlingResource.decrement();
+
         if(callbackInterface != null){
             callbackInterface.onPostTask(result);
         }
